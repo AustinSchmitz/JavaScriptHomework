@@ -1,0 +1,77 @@
+<html>
+	<body><p><center>
+		<input id="myInput" type="text" size ="40"> = <span id="result">result</span>
+		</center></p></body>
+
+	<script>
+			
+			Array.prototype.toString = function() { return '[' + this.join(', ') + ']'; };
+			function isScalar(x) { return typeof x == 'number'; }
+			function isVector(x) { return x instanceof Array && typeof x[0] == 'number'; }
+			function isMatrix(x) { return x instanceof Array && x[0] instanceof Array; }
+// TODO
+	
+				function parse(string){
+					var split1 = string.split("+");
+					if(split1.length > 1){
+						return vectorAdd(eval(split1[0]),eval(split1[1]));
+					}
+
+				var split2 = string.split("*");
+					if(split2.length > 1){	
+						var x = eval(split2[0]); 
+						var y = eval(split2[1]);
+
+
+				if(isScalar(x)){
+					return svProduct(x,y);
+				}
+
+				if(isMatrix(y) && isVector(x)){
+					return vmProduct(x,y);
+				}
+
+				if(isMatrix(x) && isMatrix(y)){
+					return matrixProduct(x,y); 
+				}
+				
+			 }
+}
+			function zip(a, b) {
+  				var arr = [];
+  				var l = Math.min(a.length,b.length);
+  				for (i = 0; i < l; i++){
+  					arr.push({_1: a[i], _2: b[i]});
+  				} 
+  					return arr;
+			}
+
+			function vectorAdd(a,b) { 
+				return zip(a,b).map(function(x,y){
+					return x._1+x._2; }); 
+			}
+
+			function svProduct(a,b) { 
+				return b.map(function(x){
+					return a*x; }); 
+			}
+
+			function vmProduct(a,b) { 
+				return zip(a,b).map(function(w){
+					return svProduct(w._1,w._2);
+				}).reduce(vectorAdd);
+			}
+
+			function matrixProduct(a,b) { 
+				return a.map(function(x){
+					return vmProduct(x,b);
+				}); 
+			}
+
+			document.getElementById('myInput').onchange = function() {
+                var finals = parse(this.value);
+                document.getElementById('result').innerHTML = finals;
+            } 
+        
+</script>
+</html>
